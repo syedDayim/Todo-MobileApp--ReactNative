@@ -1,45 +1,66 @@
 import React, { useState } from "react";
-import { FlatList, Text, View, StyleSheet } from "react-native";
+import { FlatList, StyleSheet, View, Text, Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import Item from "./components/Item";
+import Input from "./components/Input";
 
 export default function Index() {
-  const items = [
+  const initialItems = [
     { task: "Learn React Native", id: "1" },
     { task: "Learn Routing", id: "2" },
     { task: "Make Projects", id: "3" },
   ];
 
-  const [tasks, setTasks] = useState(items);
+  const [tasks, setTasks] = useState(initialItems);
+
+  const handleDelete = (id) => {
+    setTasks((prevTasks) => prevTasks.filter((task) => task.id !== id));
+  };
+
+  const AddTodo = (todo) => {
+    if (todo.length > 3) {
+      setTasks((prevTodos) => {
+        return [
+          { task: todo, id: Math.floor(Math.random() * 1000).toString() },
+          ...prevTodos,
+        ];
+      });
+    } else {
+      Alert.alert("Opps", "Text Must be over 3 characters", [
+        { text: "understood", onPress: () => console.log("Closed") },
+      ]);
+    }
+  };
 
   return (
-    <SafeAreaView>
-      {/* Text Input will go here */}
-      {/* List of Todo will go here */}
+    <SafeAreaView style={styles.container}>
+      <Input AddTodo={AddTodo} />
 
-      <FlatList
-        style={{ marginTop: 60 }}
-        data={tasks}
-        keyExtractor={(item) => item.id} // Convert id to string
-        renderItem={({ item }) => (
-          <View style={styles.listItemContainer}>
-            <Text style={styles.listItemText}>{item.task}</Text>
-          </View>
-        )}
-      />
+      {tasks.length === 0 ? (
+        <View style={styles.emptyContainer}>
+          <Text>Add todo above</Text>
+        </View>
+      ) : (
+        <FlatList
+          style={{ marginTop: 20 }}
+          data={tasks}
+          keyExtractor={(item) => item.id} // Ensure keyExtractor is correctly defined
+          renderItem={({ item }) => (
+            <Item taskItem={item} onDelete={() => handleDelete(item.id)} />
+          )}
+        />
+      )}
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  listItemContainer: {
-    padding: 10,
-    borderWidth: 1,
-    marginVertical: 5,
-    marginHorizontal: 20,
-    borderRadius: 6,
+  container: {
+    flex: 1,
   },
-  listItemText: {
-    fontWeight: "700",
-    fontSize: 15,
+  emptyContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
   },
 });

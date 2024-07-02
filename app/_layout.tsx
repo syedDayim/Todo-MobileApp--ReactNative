@@ -20,7 +20,6 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     color: "white",
-    fontFamily: "Helvetica",
     fontWeight: "bold",
   }
 })
