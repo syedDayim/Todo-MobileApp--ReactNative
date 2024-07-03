@@ -1,6 +1,14 @@
 import React, { useState } from "react";
-import { FlatList, StyleSheet, View, Text, Alert } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import {
+  FlatList,
+  StyleSheet,
+  View,
+  Text,
+  Alert,
+  Keyboard,
+  TouchableWithoutFeedback,
+  ScrollView,
+} from "react-native";
 import Item from "./components/Item";
 import Input from "./components/Input";
 
@@ -14,7 +22,24 @@ export default function Index() {
   const [tasks, setTasks] = useState(initialItems);
 
   const handleDelete = (id) => {
-    setTasks((prevTasks) => prevTasks.filter((task) => task.id !== id));
+    Alert.alert(
+      "Delete Task",
+      "Do you really want to delete this task?",
+      [
+        {
+          text: "Cancel",
+          onPress: () => console.log("Cancel Pressed"),
+          style: "cancel"
+        },
+        {
+          text: "Yes", 
+          onPress: () => {
+            setTasks((prevTasks) => prevTasks.filter((task) => task.id !== id));
+          }
+        }
+      ],
+      { cancelable: false }
+    );
   };
 
   const AddTodo = (todo) => {
@@ -26,35 +51,42 @@ export default function Index() {
         ];
       });
     } else {
-      Alert.alert("Opps", "Text Must be over 3 characters", [
-        { text: "understood", onPress: () => console.log("Closed") },
+      Alert.alert("Oops", "Text must be over 3 characters", [
+        { text: "Understood", onPress: () => console.log("Closed") },
       ]);
     }
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <Input AddTodo={AddTodo} />
+    <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
+      <ScrollView contentContainerStyle={styles.scrollViewContainer}>
+        <View style={styles.container}>
+          <Input AddTodo={AddTodo} />
 
-      {tasks.length === 0 ? (
-        <View style={styles.emptyContainer}>
-          <Text>Add todo above</Text>
-        </View>
-      ) : (
-        <FlatList
-          style={{ marginTop: 20 }}
-          data={tasks}
-          keyExtractor={(item) => item.id} // Ensure keyExtractor is correctly defined
-          renderItem={({ item }) => (
-            <Item taskItem={item} onDelete={() => handleDelete(item.id)} />
+          {tasks.length === 0 ? (
+            <View style={styles.emptyContainer}>
+              <Text>Add todo above</Text>
+            </View>
+          ) : (
+            <FlatList
+              style={{ marginTop: 20 }}
+              data={tasks}
+              keyExtractor={(item) => item.id}
+              renderItem={({ item }) => (
+                <Item taskItem={item} onDelete={() => handleDelete(item.id)} />
+              )}
+            />
           )}
-        />
-      )}
-    </SafeAreaView>
+        </View>
+      </ScrollView>
+    </TouchableWithoutFeedback>
   );
 }
 
 const styles = StyleSheet.create({
+  scrollViewContainer: {
+    flexGrow: 1,
+  },
   container: {
     flex: 1,
   },
